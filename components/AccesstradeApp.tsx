@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SHELL_HTML } from "@/lib/shell";
 import {
   destroyAccesstradeMockup,
@@ -9,13 +9,22 @@ import {
 
 export default function AccesstradeApp() {
   const rootRef = useRef<HTMLDivElement>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const root = rootRef.current;
     if (!root) return;
 
+    // Empty host only — avoid React children overwriting injected DOM.
     root.innerHTML = SHELL_HTML;
-    initAccesstradeMockup();
+    try {
+      initAccesstradeMockup();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.error("[AccesstradeApp] init failed:", err);
+      setError(message);
+      root.innerHTML = "";
+    }
 
     return () => {
       destroyAccesstradeMockup();
@@ -23,25 +32,32 @@ export default function AccesstradeApp() {
     };
   }, []);
 
+  if (error) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "grid",
+          placeItems: "center",
+          padding: 24,
+          color: "#b91c1c",
+          fontWeight: 700,
+          textAlign: "center",
+        }}
+      >
+        Gagal memuat dashboard Accesstrade.
+        <div style={{ marginTop: 8, fontWeight: 600, color: "#4b5563" }}>
+          {error}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       ref={rootRef}
       suppressHydrationWarning
-      aria-busy="true"
       aria-label="Dashboard Accesstrade"
-    >
-      <div
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          color: "#4b5563",
-          fontWeight: 700,
-        }}
-      >
-        Memuat dashboard Accesstrade…
-      </div>
-    </div>
+    />
   );
 }

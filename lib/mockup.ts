@@ -4,6 +4,9 @@ let _initialized = false;
 let _listeners = [];
 
 function on(target, type, handler, opts) {
+  if (!target) {
+    throw new Error(`[mockup] missing event target for "${type}"`);
+  }
   target.addEventListener(type, handler, opts);
   _listeners.push([target, type, handler, opts]);
 }
