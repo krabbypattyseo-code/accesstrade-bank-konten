@@ -1,0 +1,11 @@
+@import "tailwindcss";
+@import "./accesstrade.css";
+
+/* Keep Accesstrade dashboard look — do not let Tailwind theme override it */
+body {
+  margin: 0;
+  font-family: var(--font-nunito), "Nunito", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 14px;
+}
